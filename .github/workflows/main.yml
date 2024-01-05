@@ -38,13 +38,15 @@ jobs:
       matrix-step-name: build
       matrix-key: ${{ matrix.function-dir }}
 
+  ## workaround for issue:
+  # https://github.com/orgs/community/discussions/26671
   vars-dev:
     runs-on: ubuntu-latest
     environment: dev
     outputs:
       backend-key: ${{ vars.BACKEND_KEY }}
     steps:
-      - run: echo "Exposing env vars"
+      - run: echo "ok"
 
   images-tfvars:
     needs: [ build ]
