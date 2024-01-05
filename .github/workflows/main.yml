@@ -38,6 +38,14 @@ jobs:
       matrix-step-name: build
       matrix-key: ${{ matrix.function-dir }}
 
+  vars-dev:
+    runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      backend-key: ${{ vars.BACKEND_KEY }}
+    steps:
+      - run: echo "Exposing env vars"
+
   images-tfvars:
     needs: [ build ]
     name: Images TF vars
@@ -47,38 +55,17 @@ jobs:
       matrix-step-name: build
 
   tfbackend-dev:
-    needs: [ build ]
+    needs: [ build, vars-dev ]
     name: TF Backend - dev
-    environment: dev
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
       runs-on: ubuntu-latest
       environment: dev
       bucket: ${{ vars.BACKEND_BUCKET }}
       table: ${{ vars.BACKEND_TABLE }}
-      key: ${{ vars.BACKEND_KEY }}
+      key: ${{ needs.vars-dev.outputs.backend-key }}
       region: ${{ vars.AWS_REGION }}
       tfbackend: dev.s3.tfbackend
-
-
-  example-dev:
-    needs: [ build ]
-
-    runs-on: ubuntu-latest
-
-    environment: dev
-
-    defaults:
-      run:
-        shell: bash
-
-    steps:
-
-      - name: Inspect
-        run: |
-          echo "key: ${{ vars.BACKEND_KEY }}"
-          echo "workdir: ${{ vars.WORKDIR }}"
-
 
   # tf-plan-dev:
   #   name: TF Plan - dev
