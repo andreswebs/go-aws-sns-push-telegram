@@ -49,6 +49,7 @@ jobs:
   tfbackend-dev:
     needs: [ build ]
     name: TF Backend - dev
+    environment: dev
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
       runs-on: ubuntu-latest
