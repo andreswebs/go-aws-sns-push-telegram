@@ -50,8 +50,24 @@ jobs:
     name: TF Backend - dev
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
+      runs-on: ununtu-latest
       bucket: ${{ vars.BACKEND_BUCKET }}
       table: ${{ vars.BACKEND_TABLE }}
       key: ${{ vars.BACKEND_KEY }}
       region: ${{ vars.AWS_REGION }}
       filename: dev.s3.tfbackend
+
+  # tf-plan:
+  #   name: TF Plan - dev
+  #   needs: [ tfbackend, image-tfvars ]
+  #   uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
+  #   with:
+  #     runs-on: ununtu-latest
+  #     environment: dev
+  #     working-directory: ${{ vars.WORKDIR }}
+  #     aws-region: ${{ vars.AWS_REGION }}
+  #     role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+  #     tfbackend: ${{ needs.tfbackend.outputs.filename }}
+  #     tfvars: ${{ needs.tfvars.outputs.filename }}
+  #     filename: dev.tfplan
+
