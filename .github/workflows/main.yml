@@ -28,6 +28,7 @@ jobs:
       matrix-key: ${{ matrix.function-dir }}
 
   images-tfvars:
+    needs: [ build ]
     uses: andreswebs/gh-actions/.github/workflows/images-tfvars.yml@main
     with:
       runs-on: ubuntu-latest
