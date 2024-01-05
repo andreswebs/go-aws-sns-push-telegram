@@ -45,3 +45,13 @@ jobs:
       runs-on: ubuntu-latest
       matrix-step-name: build
 
+  tfbackend:
+    needs: [ build ]
+    name: TF Backend - dev
+    uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
+    with:
+      bucket: ${{ vars.BACKEND_BUCKET }}
+      table: ${{ vars.BACKEND_TABLE }}
+      key: ${{ vars.BACKEND_KEY }}
+      region: ${{ vars.AWS_REGION }}
+      filename: dev.s3.tfbackend
