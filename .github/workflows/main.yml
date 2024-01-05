@@ -59,6 +59,26 @@ jobs:
       region: ${{ vars.AWS_REGION }}
       tfbackend: dev.s3.tfbackend
 
+
+  example-dev:
+    needs: [ build ]
+
+    runs-on: ubuntu-latest
+
+    environment: dev
+
+    defaults:
+      run:
+        shell: bash
+
+    steps:
+
+      - name: Inspect
+        run: |
+          echo "key: ${{ vars.BACKEND_KEY }}"
+          echo "workdir: ${{ vars.WORKDIR }}"
+
+
   # tf-plan-dev:
   #   name: TF Plan - dev
   #   needs: [ tfbackend-dev, image-tfvars ]
