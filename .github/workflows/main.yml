@@ -52,11 +52,12 @@ jobs:
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
       runs-on: ubuntu-latest
+      environment: dev
       bucket: ${{ vars.BACKEND_BUCKET }}
       table: ${{ vars.BACKEND_TABLE }}
       key: ${{ vars.BACKEND_KEY }}
       region: ${{ vars.AWS_REGION }}
-      filename: dev.s3.tfbackend
+      tfbackend: dev.s3.tfbackend
 
   # tf-plan-dev:
   #   name: TF Plan - dev
@@ -68,7 +69,7 @@ jobs:
   #     working-directory: ${{ vars.WORKDIR }}
   #     aws-region: ${{ vars.AWS_REGION }}
   #     role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
-  #     tfbackend: ${{ needs.tfbackend.outputs.filename }}
+  #     tfbackend: ${{ needs.tfbackend-dev.outputs.tfbackend }}
+  #     tfbackend-is-artifact: true
   #     tfvars: ${{ needs.images-tfvars.outputs.tfvars }}
-  #     filename: dev.tfplan
-
+  #     tfplan: dev.tfplan
