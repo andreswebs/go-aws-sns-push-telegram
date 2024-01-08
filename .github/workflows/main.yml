@@ -105,7 +105,7 @@ jobs:
 
   tf-apply-dev:
     name: TF Apply - dev
-    needs: [ tfbackend-dev, vars-dev, tf-plan-dev ]
+    needs: [ tfbackend-dev, vars-dev, tf-plan-dev, images-tag-dev ]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
       runs-on: ubuntu-latest
