@@ -95,8 +95,22 @@ jobs:
       tfvars: ${{ needs.tfvars-dev.outputs.tfvars }}
       tfplan: dev.tfplan
 
-  # images-tag-dev:
-  #   needs: [ build, images-tfvars ]
-  #   uses: andreswebs/gh-actions/.github/workflows/images-env-tags.yml@main
-  #   environment: dev
-  #   role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+  images-tag-dev:
+    needs: [ tf-plan-dev ]
+    uses: andreswebs/gh-actions/.github/workflows/images-env-tags.yml@main
+    environment: dev
+    role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+
+  tf-apply-dev:
+    name: TF Plan - dev
+    needs: [ tfbackend-dev, vars-dev, tf-plan-dev ]
+    uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
+    with:
+      runs-on: ubuntu-latest
+      environment: dev
+      aws-region: ${{ vars.AWS_REGION }}
+      role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+      working-directory: ${{ needs.vars-dev.outputs.workdir }}
+      tfbackend: ${{ needs.tfbackend-dev.outputs.tfbackend }}
+      tfbackend-is-artifact: true
+      tfplan: ${{ needs.tf-plan-dev.outputs.tfplan }}
