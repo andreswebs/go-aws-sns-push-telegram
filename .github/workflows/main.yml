@@ -48,7 +48,7 @@ jobs:
   ## workaround for issue:
   # https://github.com/orgs/community/discussions/26671
   vars-dev:
-    needs: [ build, images-tfvars ]
+    needs: [ images-tfvars ]
     runs-on: ubuntu-latest
     environment: dev
     outputs:
@@ -60,7 +60,7 @@ jobs:
       - run: echo
 
   tfbackend-dev:
-    needs: [ build, vars-dev, images-tfvars ]
+    needs: [ images-tfvars, vars-dev ]
     name: TF Backend - dev
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
