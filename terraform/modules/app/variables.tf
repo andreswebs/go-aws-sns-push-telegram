@@ -28,7 +28,7 @@ variable "ssm_param_telegram_chat_id" {
 }
 
 variable "topic_name" {
-  type = string
+  type        = string
   description = "SNS topic name"
-  default = "telegram-notifications"
+  default     = "telegram-notifications"
 }
