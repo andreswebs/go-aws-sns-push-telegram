@@ -104,7 +104,7 @@ jobs:
       role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
 
   tf-apply-dev:
-    name: TF Plan - dev
+    name: TF Apply - dev
     needs: [ tfbackend-dev, vars-dev, tf-plan-dev ]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
