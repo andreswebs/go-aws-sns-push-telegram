@@ -1,2 +1,11 @@
-.envrc
+.terraform
+*.tfvars*
+*.tfstate*
+*.tfbackend*
+
+*.diff
+*.bak
+
 scripts/
+
+.envrc

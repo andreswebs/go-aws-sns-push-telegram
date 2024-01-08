@@ -23,7 +23,6 @@ on:
 jobs:
 
   build:
-
     strategy:
       matrix:
         function-dir: [ lambda ]
@@ -38,16 +37,6 @@ jobs:
       matrix-step-name: build
       matrix-key: ${{ matrix.function-dir }}
 
-  ## workaround for issue:
-  # https://github.com/orgs/community/discussions/26671
-  vars-dev:
-    runs-on: ubuntu-latest
-    environment: dev
-    outputs:
-      backend-key: ${{ vars.BACKEND_KEY }}
-    steps:
-      - run: echo "ok"
-
   images-tfvars:
     needs: [ build ]
     name: Images TF vars
@@ -56,8 +45,21 @@ jobs:
       runs-on: ubuntu-latest
       matrix-step-name: build
 
+  ## workaround for issue:
+  # https://github.com/orgs/community/discussions/26671
+  vars-dev:
+    needs: [ build, images-tfvars ]
+    runs-on: ubuntu-latest
+    environment: dev
+    outputs:
+      backend-key: ${{ vars.BACKEND_KEY }}
+      ssm-param-telegram-bot-token: ${{ vars.SSM_PARAM_TELEGRAM_BOT_TOKEN }}
+      ssm-param-telegram-chat-id: ${{ vars.SSM_PARAM_TELEGRAM_CHAT_ID }}
+    steps:
+      - run: echo
+
   tfbackend-dev:
-    needs: [ build, vars-dev ]
+    needs: [ build, images-tfvars ]
     name: TF Backend - dev
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
@@ -69,9 +71,17 @@ jobs:
       region: ${{ vars.AWS_REGION }}
       tfbackend: dev.s3.tfbackend
 
+  tfvars-dev:
+    needs: [ vars-dev ]
+    uses: ./.github/workflows/tfvars.yml
+    with:
+      runs-on: ubuntu-latest
+      ssm-param-telegram-bot-token: ${{ needs.vars-dev.outputs.ssm-param-telegram-bot-token }}
+      ssm-param-telegram-chat-id: ${{ needs.vars-dev.outputs.ssm-param-telegram-chat-id }}
+
   # tf-plan-dev:
   #   name: TF Plan - dev
-  #   needs: [ tfbackend-dev, image-tfvars ]
+  #   needs: [ tfbackend-dev, tfvars-dev ]
   #   uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
   #   with:
   #     runs-on: ununtu-latest
@@ -81,5 +91,12 @@ jobs:
   #     role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
   #     tfbackend: ${{ needs.tfbackend-dev.outputs.tfbackend }}
   #     tfbackend-is-artifact: true
-  #     tfvars: ${{ needs.images-tfvars.outputs.tfvars }}
+  #     images-tfvars: ${{ needs.images-tfvars.outputs.tfvars }}
+  #     tfvars: ${{ needs.tfvars-dev.outputs.tfvars }}
   #     tfplan: dev.tfplan
+
+  # images-tag-dev:
+  #   needs: [ build, images-tfvars ]
+  #   uses: andreswebs/gh-actions/.github/workflows/images-env-tags.yml@main
+  #   environment: dev
+  #   role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}

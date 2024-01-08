@@ -1,0 +1,50 @@
+---
+on:
+  workflow_call:
+
+    inputs:
+      runs-on:
+        required: true
+        type: string
+      tfvars:
+        required: false
+        type: string
+        default: terraform.tfvars
+      ssm-param-telegram-bot-token:
+        required: true
+        type: string
+      ssm-param-telegram-chat-id:
+        required: true
+        type: string
+
+    outputs:
+      tfvars:
+        description: The filename used to save the tfvars
+        value: ${{ jobs.tfvars.outputs.filename }}
+
+jobs:
+
+  tfvars:
+
+    runs-on: ${{ inputs.runs-on }}
+
+    outputs:
+      tfvars: ${{ steps.render.outputs.filename }}
+
+    steps:
+
+      - name: Render .tfvars
+        id: render
+        run: |
+          cat > ./${{ inputs.tfvars }} << EOF
+          ssm_param_telegram_bot_token = "${{ inputs.ssm-param-telegram-bot-token }}"
+          ssm_param_telegram_chat_id   = "${{ inputs.ssm-param-telegram-chat-id }}"
+          EOF
+          echo "filename=${{ inputs.tfvars }}" >> $GITHUB_OUTPUT
+
+      - name: Save .tfvars
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ steps.render.outputs.filename }}
+          path: ./${{ steps.render.outputs.filename }}
+          if-no-files-found: error
