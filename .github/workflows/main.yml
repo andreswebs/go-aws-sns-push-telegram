@@ -79,21 +79,21 @@ jobs:
       ssm-param-telegram-bot-token: ${{ needs.vars-dev.outputs.ssm-param-telegram-bot-token }}
       ssm-param-telegram-chat-id: ${{ needs.vars-dev.outputs.ssm-param-telegram-chat-id }}
 
-  # tf-plan-dev:
-  #   name: TF Plan - dev
-  #   needs: [ tfbackend-dev, tfvars-dev ]
-  #   uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
-  #   with:
-  #     runs-on: ununtu-latest
-  #     environment: dev
-  #     working-directory: ${{ vars.WORKDIR }}
-  #     aws-region: ${{ vars.AWS_REGION }}
-  #     role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
-  #     tfbackend: ${{ needs.tfbackend-dev.outputs.tfbackend }}
-  #     tfbackend-is-artifact: true
-  #     images-tfvars: ${{ needs.images-tfvars.outputs.tfvars }}
-  #     tfvars: ${{ needs.tfvars-dev.outputs.tfvars }}
-  #     tfplan: dev.tfplan
+  tf-plan-dev:
+    name: TF Plan - dev
+    needs: [ tfbackend-dev, tfvars-dev ]
+    uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
+    with:
+      runs-on: ununtu-latest
+      environment: dev
+      working-directory: ${{ vars.WORKDIR }}
+      aws-region: ${{ vars.AWS_REGION }}
+      role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+      tfbackend: ${{ needs.tfbackend-dev.outputs.tfbackend }}
+      tfbackend-is-artifact: true
+      images-tfvars: ${{ needs.images-tfvars.outputs.tfvars }}
+      tfvars: ${{ needs.tfvars-dev.outputs.tfvars }}
+      tfplan: dev.tfplan
 
   # images-tag-dev:
   #   needs: [ build, images-tfvars ]
