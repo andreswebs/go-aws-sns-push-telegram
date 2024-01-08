@@ -84,7 +84,7 @@ jobs:
     needs: [ tfbackend-dev, tfvars-dev ]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
-      runs-on: ununtu-latest
+      runs-on: ubuntu-latest
       environment: dev
       working-directory: ${{ vars.WORKDIR }}
       aws-region: ${{ vars.AWS_REGION }}
