@@ -52,6 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: dev
     outputs:
+      workdir: ${{ vars.WORKDIR }}
       backend-key: ${{ vars.BACKEND_KEY }}
       ssm-param-telegram-bot-token: ${{ vars.SSM_PARAM_TELEGRAM_BOT_TOKEN }}
       ssm-param-telegram-chat-id: ${{ vars.SSM_PARAM_TELEGRAM_CHAT_ID }}
@@ -81,14 +82,14 @@ jobs:
 
   tf-plan-dev:
     name: TF Plan - dev
-    needs: [ tfbackend-dev, tfvars-dev ]
+    needs: [ tfbackend-dev, vars-dev, tfvars-dev ]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
       runs-on: ubuntu-latest
       environment: dev
-      working-directory: ${{ vars.WORKDIR }}
       aws-region: ${{ vars.AWS_REGION }}
       role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+      working-directory: ${{ needs.vars-dev.outputs.workdir }}
       tfbackend: ${{ needs.tfbackend-dev.outputs.tfbackend }}
       tfbackend-is-artifact: true
       images-tfvars: ${{ needs.images-tfvars.outputs.tfvars }}
