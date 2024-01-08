@@ -4,6 +4,7 @@ name: Main
 permissions:
   id-token: write
   contents: read
+  security-events: write
 
 on:
   push:
