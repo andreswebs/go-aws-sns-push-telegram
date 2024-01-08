@@ -98,8 +98,9 @@ jobs:
   images-tag-dev:
     needs: [ tf-plan-dev ]
     uses: andreswebs/gh-actions/.github/workflows/images-env-tags.yml@main
-    environment: dev
-    role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+    with:
+      environment: dev
+      role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
 
   tf-apply-dev:
     name: TF Plan - dev
