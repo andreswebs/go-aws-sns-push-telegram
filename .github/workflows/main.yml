@@ -60,7 +60,7 @@ jobs:
       - run: echo
 
   tfbackend-dev:
-    needs: [ build, images-tfvars ]
+    needs: [ build, vars-dev, images-tfvars ]
     name: TF Backend - dev
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
