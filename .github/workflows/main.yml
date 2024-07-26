@@ -11,24 +11,23 @@ on:
     branches:
       - main
     paths-ignore:
-      - '**.md'
+      - "**.md"
       - ./.github/dependabot.yml
 
   pull_request:
     branches:
-      - '*'
+      - "*"
     paths-ignore:
-      - '**.md'
+      - "**.md"
       - ./.github/dependabot.yml
 
 jobs:
-
   build:
     strategy:
       matrix:
-        function-dir: [ lambda ]
+        function-dir: [lambda]
 
-    uses: andreswebs/gh-actions/.github/workflows/ecr-publish-image.yml@main
+    uses: andreswebs/gh-actions/.github/workflows/aws-ecr-push-image.yml@main
     with:
       runs-on: ubuntu-latest
       aws-region: ${{ vars.AWS_REGION }}
@@ -39,7 +38,7 @@ jobs:
       matrix-key: ${{ matrix.function-dir }}
 
   images-tfvars:
-    needs: [ build ]
+    needs: [build]
     uses: andreswebs/gh-actions/.github/workflows/images-tfvars.yml@main
     with:
       runs-on: ubuntu-latest
@@ -48,7 +47,7 @@ jobs:
   ## workaround for issue:
   # https://github.com/orgs/community/discussions/26671
   vars-dev:
-    needs: [ images-tfvars ]
+    needs: [images-tfvars]
     runs-on: ubuntu-latest
     environment: dev
     outputs:
@@ -60,7 +59,7 @@ jobs:
       - run: echo
 
   tfbackend-dev:
-    needs: [ images-tfvars, vars-dev ]
+    needs: [images-tfvars, vars-dev]
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
       runs-on: ubuntu-latest
@@ -72,7 +71,7 @@ jobs:
       tfbackend: dev.s3.tfbackend
 
   tfvars-dev:
-    needs: [ vars-dev ]
+    needs: [vars-dev]
     uses: ./.github/workflows/tfvars.yml
     with:
       runs-on: ubuntu-latest
@@ -81,7 +80,7 @@ jobs:
 
   tf-plan-dev:
     name: TF Plan - dev
-    needs: [ images-tfvars, tfbackend-dev, vars-dev, tfvars-dev ]
+    needs: [images-tfvars, tfbackend-dev, vars-dev, tfvars-dev]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
       runs-on: ubuntu-latest
@@ -96,7 +95,7 @@ jobs:
       tfplan: dev.tfplan
 
   images-tag-dev:
-    needs: [ tf-plan-dev ]
+    needs: [tf-plan-dev]
     uses: andreswebs/gh-actions/.github/workflows/images-env-tags.yml@main
     with:
       runs-on: ubuntu-latest
@@ -106,7 +105,7 @@ jobs:
 
   tf-apply-dev:
     name: TF Apply - dev
-    needs: [ tfbackend-dev, vars-dev, tf-plan-dev, images-tag-dev ]
+    needs: [tfbackend-dev, vars-dev, tf-plan-dev, images-tag-dev]
     uses: andreswebs/gh-actions/.github/workflows/tf-apply.yml@main
     with:
       runs-on: ubuntu-latest

@@ -9,3 +9,4 @@
 scripts/
 
 .envrc
+.DS_Store

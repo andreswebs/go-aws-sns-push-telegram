@@ -14,7 +14,7 @@ import (
 )
 
 type Payload struct {
-  ChatID string `json:"chat_id"`
+	ChatID string `json:"chat_id"`
 	Text   string `json:"text"`
 }
 
@@ -42,10 +42,6 @@ func init() {
 	endpoint = fmt.Sprintf("%s/bot%s/sendMessage", apiURL, token)
 }
 
-func main() {
-	lambda.Start(handler)
-}
-
 func handler(ctx context.Context, snsEvent events.SNSEvent) {
 	for _, r := range snsEvent.Records {
 		snsRecord := r.SNS
@@ -62,6 +58,10 @@ func handler(ctx context.Context, snsEvent events.SNSEvent) {
 		}
 	}
 
+}
+
+func main() {
+	lambda.Start(handler)
 }
 
 func sendMsg(url, msg string) error {
