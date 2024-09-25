@@ -20,17 +20,10 @@ locals {
 
 
 module "lambda_base" {
-  source  = "andreswebs/lambda-container/aws"
-  version = "4.0.0"
-
-  create_lambda = false
-  use_id        = false
-
-  lambda_image_uri = ""
-
-  lambda_name_prefix = var.service_name
+  source  = "andreswebs/lambda-base/aws"
+  version = "0.3.0"
+  name    = var.service_name
 }
-
 
 module "lambda" {
   depends_on                 = [module.lambda_base]
@@ -42,7 +35,7 @@ module "lambda" {
   create_role                = false
   create_package             = false
   environment_variables      = local.lambda_env
-  lambda_role                = module.lambda_base.role.arn
+  lambda_role                = module.lambda_base.iam_role.arn
   package_type               = "Image"
   publish                    = true
   memory_size                = 256
