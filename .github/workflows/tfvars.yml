@@ -15,7 +15,7 @@ on:
       ssm-param-telegram-chat-id:
         required: true
         type: string
-      ssm-param-image-lambda-uri:
+      ssm-param-lambda-image-uri:
         required: true
         type: string
 
