@@ -36,6 +36,7 @@ jobs:
       role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
       ecr-repo-name: ${{ vars.AWS_ECR_REPO_NAME }}
       context-dir: ./${{ matrix.function-dir }}
+      image-artifact: image
       matrix-step-name: build
       matrix-key: ${{ matrix.function-dir }}
 
