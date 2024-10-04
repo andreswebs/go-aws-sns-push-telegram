@@ -99,14 +99,15 @@ jobs:
       tfvars: ${{ needs.tfvars-dev.outputs.tfvars }}
       tfplan: dev.tfplan
 
-  image-tag-dev:
-    needs: [tf-plan-dev]
-    uses: andreswebs/gh-actions/.github/workflows/aws-ecr-add-env-tag.yml@main
-    with:
-      runs-on: ubuntu-latest
-      environment: dev
-      aws-region: ${{ vars.AWS_REGION }}
-      role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+  # image-tag-dev:
+  #   needs: [tf-plan-dev]
+  #   uses: andreswebs/gh-actions/.github/workflows/aws-ecr-add-env-tag.yml@main
+  #   with:
+  #     runs-on: ubuntu-latest
+  #     environment: dev
+  #     aws-region: ${{ vars.AWS_REGION }}
+  #     role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+  #     image-uri:
 
   tf-apply-dev:
     name: TF Apply - dev
