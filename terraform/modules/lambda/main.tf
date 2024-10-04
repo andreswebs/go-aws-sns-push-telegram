@@ -8,6 +8,10 @@ data "aws_ssm_parameter" "telegram_chat_id" {
   with_decryption = true
 }
 
+data "aws_ssm_parameter" "lambda_image_uri" {
+  with_decryption = true
+  name            = var.ssm_param_lambda_image_uri
+}
 
 locals {
   lambda_env = {
@@ -16,6 +20,8 @@ locals {
   }
 
   lambda_alias = "default"
+
+  lambda_image_uri = data.aws_ssm_parameter.lambda_image_uri.value
 }
 
 
@@ -30,7 +36,7 @@ module "lambda" {
   source                     = "terraform-aws-modules/lambda/aws"
   function_name              = var.service_name
   description                = var.service_description
-  image_uri                  = var.image_uri
+  image_uri                  = local.lambda_image_uri
   create_lambda_function_url = false
   create_role                = false
   create_package             = false

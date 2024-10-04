@@ -25,34 +25,20 @@ on:
 
 jobs:
   build:
-    strategy:
-      matrix:
-        function:
-          - name: sns-to-telegram
-            dir: ./lambda
-
+    name: Build
     uses: andreswebs/gh-actions/.github/workflows/aws-ecr-push-image.yml@main
     with:
       runs-on: ubuntu-latest
       aws-region: ${{ vars.AWS_REGION }}
       role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
-      ecr-repo-name: ${{ vars.AWS_ECR_REPO_NAMESPACE }}/${{ matrix.function.name }}
-      context-dir: ${{ matrix.function.dir }}
-      image-artifact: image-${{ matrix.function.name }}
-      matrix-step-name: build
-      matrix-key: ${{ matrix.function.name }}
-
-  images-tfvars:
-    needs: [build]
-    uses: andreswebs/gh-actions/.github/workflows/images-tfvars.yml@main
-    with:
-      runs-on: ubuntu-latest
-      matrix-step-name: build
+      ecr-repo-name: ${{ vars.AWS_ECR_REPO_NAMESPACE }}/sns-to-telegram
+      context-dir: ./lambda
+      image-artifact: image-sns-to-telegram
 
   ## workaround for issue:
   # https://github.com/orgs/community/discussions/26671
   vars-dev:
-    needs: [images-tfvars]
+    needs: [build]
     runs-on: ubuntu-latest
     environment: dev
     outputs:
@@ -60,11 +46,25 @@ jobs:
       backend-key: ${{ vars.BACKEND_KEY }}
       ssm-param-telegram-bot-token: ${{ vars.SSM_PARAM_TELEGRAM_BOT_TOKEN }}
       ssm-param-telegram-chat-id: ${{ vars.SSM_PARAM_TELEGRAM_CHAT_ID }}
+      ssm-param-lambda-image-uri: ${{ vars.SSM_PARAM_LAMBDA_IMAGE_URI }}
     steps:
-      - run: echo
+      - name: Get image URI
+        id: image-uri
+        uses: andreswebs/gh-actions/.github/actions/artifact-as-value@main
+        with:
+          key: image-sns-to-telegram
+
+      - name: Update config parameter
+        uses: andreswebs/gh-actions/.github/actions/aws-ssm-put-param@main
+        with:
+          aws-region: ${{ vars.AWS_REGION }}
+          role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
+          parameter-name: ${{ vars.SSM_PARAM_LAMBDA_IMAGE_URI }}
+          parameter-value: ${{ steps.image-uri.outputs.value }}-arm64
+          parameter-type: String
 
   tfbackend-dev:
-    needs: [images-tfvars, vars-dev]
+    needs: [vars-dev]
     uses: andreswebs/gh-actions/.github/workflows/tfbackend.yml@main
     with:
       runs-on: ubuntu-latest
@@ -82,10 +82,11 @@ jobs:
       runs-on: ubuntu-latest
       ssm-param-telegram-bot-token: ${{ needs.vars-dev.outputs.ssm-param-telegram-bot-token }}
       ssm-param-telegram-chat-id: ${{ needs.vars-dev.outputs.ssm-param-telegram-chat-id }}
+      ssm-param-lambda-image-uri: ${{ needs.vars-dev.outputs.ssm-param-lambda-image-uri }}
 
   tf-plan-dev:
     name: TF Plan - dev
-    needs: [images-tfvars, tfbackend-dev, vars-dev, tfvars-dev]
+    needs: [tfbackend-dev, vars-dev, tfvars-dev]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
       runs-on: ubuntu-latest
@@ -95,13 +96,12 @@ jobs:
       working-directory: ${{ needs.vars-dev.outputs.workdir }}
       tfbackend: ${{ needs.tfbackend-dev.outputs.tfbackend }}
       tfbackend-is-artifact: true
-      images-tfvars: ${{ needs.images-tfvars.outputs.tfvars }}
       tfvars: ${{ needs.tfvars-dev.outputs.tfvars }}
       tfplan: dev.tfplan
 
-  images-tag-dev:
+  image-tag-dev:
     needs: [tf-plan-dev]
-    uses: andreswebs/gh-actions/.github/workflows/images-env-tags.yml@main
+    uses: andreswebs/gh-actions/.github/workflows/aws-ecr-add-env-tag.yml@main
     with:
       runs-on: ubuntu-latest
       environment: dev
@@ -110,7 +110,7 @@ jobs:
 
   tf-apply-dev:
     name: TF Apply - dev
-    needs: [tfbackend-dev, vars-dev, tf-plan-dev, images-tag-dev]
+    needs: [image-tag-dev]
     uses: andreswebs/gh-actions/.github/workflows/tf-apply.yml@main
     with:
       runs-on: ubuntu-latest

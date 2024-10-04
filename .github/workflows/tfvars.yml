@@ -1,7 +1,6 @@
 ---
 on:
   workflow_call:
-
     inputs:
       runs-on:
         required: true
@@ -16,6 +15,9 @@ on:
       ssm-param-telegram-chat-id:
         required: true
         type: string
+      ssm-param-image-lambda-uri:
+        required: true
+        type: string
 
     outputs:
       tfvars:
@@ -23,22 +25,20 @@ on:
         value: ${{ jobs.tfvars.outputs.filename }}
 
 jobs:
-
   tfvars:
-
     runs-on: ${{ inputs.runs-on }}
 
     outputs:
       filename: ${{ steps.render.outputs.filename }}
 
     steps:
-
       - name: Render .tfvars
         id: render
         run: |
           cat > ./${{ inputs.tfvars }} << EOF
           ssm_param_telegram_bot_token = "${{ inputs.ssm-param-telegram-bot-token }}"
           ssm_param_telegram_chat_id   = "${{ inputs.ssm-param-telegram-chat-id }}"
+          ssm_param_lambda_image_uri   = "${{ inputs.ssm-param-image-lambda-uri }}"
           EOF
           echo "filename=${{ inputs.tfvars }}" >> $GITHUB_OUTPUT
 
