@@ -1,11 +1,11 @@
-FROM golang:1.21 as build
-ARG GOARCH=arm64
+FROM golang:1.23 AS build
 WORKDIR /app
-COPY go.mod go.sum ./
-COPY main.go .
-RUN GOOS=linux CGO_ENABLED=0 go build -o main main.go
+COPY go.mod .
+COPY go.sum .
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 go build -tags lambda.norpc -o main main.go
 
-FROM public.ecr.aws/lambda/provided:al2023
-ARG GOARCH=arm64
+FROM public.ecr.aws/lambda/provided:al2023 AS runtime
 COPY --from=build /app/main /main
-ENTRYPOINT ["/main"]
+ENTRYPOINT [ "/main" ]
