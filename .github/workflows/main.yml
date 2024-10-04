@@ -14,31 +14,33 @@ on:
       - main
     paths-ignore:
       - "**.md"
-      - ./.github/dependabot.yml
+      - ".github/**"
 
   pull_request:
     branches:
       - "*"
     paths-ignore:
       - "**.md"
-      - ./.github/dependabot.yml
+      - ".github/**"
 
 jobs:
   build:
     strategy:
       matrix:
-        function-dir: [lambda]
+        function:
+          - name: sns-to-telegram
+            dir: ./lambda
 
     uses: andreswebs/gh-actions/.github/workflows/aws-ecr-push-image.yml@main
     with:
       runs-on: ubuntu-latest
       aws-region: ${{ vars.AWS_REGION }}
       role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
-      ecr-repo-name: ${{ vars.AWS_ECR_REPO_NAME }}
-      context-dir: ./${{ matrix.function-dir }}
-      image-artifact: image
+      ecr-repo-name: ${{ vars.AWS_ECR_REPO_NAMESPACE }}/${{ matrix.function.name }}
+      context-dir: ${{ matrix.dir }}
+      image-artifact: image-${{ matrix.function.name }}
       matrix-step-name: build
-      matrix-key: ${{ matrix.function-dir }}
+      matrix-key: ${{ matrix.function.name }}
 
   images-tfvars:
     needs: [build]
