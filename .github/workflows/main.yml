@@ -111,7 +111,7 @@ jobs:
 
   tf-apply-dev:
     name: TF Apply - dev
-    needs: [image-tag-dev]
+    needs: [tf-plan-dev]
     uses: andreswebs/gh-actions/.github/workflows/tf-apply.yml@main
     with:
       runs-on: ubuntu-latest
