@@ -37,7 +37,7 @@ jobs:
       aws-region: ${{ vars.AWS_REGION }}
       role-to-assume: ${{ vars.AWS_IAM_ROLE_ARN }}
       ecr-repo-name: ${{ vars.AWS_ECR_REPO_NAMESPACE }}/${{ matrix.function.name }}
-      context-dir: ${{ matrix.dir }}
+      context-dir: ${{ matrix.function.dir }}
       image-artifact: image-${{ matrix.function.name }}
       matrix-step-name: build
       matrix-key: ${{ matrix.function.name }}
