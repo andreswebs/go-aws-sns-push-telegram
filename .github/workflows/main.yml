@@ -93,7 +93,7 @@ jobs:
 
   tf-plan-dev:
     name: TF Plan - dev
-    needs: [tfbackend-dev, tfvars-dev]
+    needs: [vars-dev, tfbackend-dev, tfvars-dev]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
       runs-on: ubuntu-latest
