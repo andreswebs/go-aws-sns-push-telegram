@@ -35,10 +35,16 @@ jobs:
       context-dir: ./lambda
       image-artifact: image-sns-to-telegram
 
+  tf-fmt-check:
+    needs: [build]
+    uses: andreswebs/gh-actions/.github/workflows/tf-fmt-check.yml@main
+    with:
+      runs-on: ubuntu-latest
+
   ## workaround for issue:
   # https://github.com/orgs/community/discussions/26671
   vars-dev:
-    needs: [build]
+    needs: [tf-fmt-check]
     runs-on: ubuntu-latest
     environment: dev
     outputs:
@@ -86,7 +92,7 @@ jobs:
 
   tf-plan-dev:
     name: TF Plan - dev
-    needs: [tfbackend-dev, vars-dev, tfvars-dev]
+    needs: [tfbackend-dev, tfvars-dev]
     uses: andreswebs/gh-actions/.github/workflows/tf-plan.yml@main
     with:
       runs-on: ubuntu-latest
