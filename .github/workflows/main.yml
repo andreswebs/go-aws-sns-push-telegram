@@ -40,7 +40,7 @@ jobs:
     uses: andreswebs/gh-actions/.github/workflows/tf-fmt-check.yml@main
     with:
       runs-on: ubuntu-latest
-      working-directory: ${{ github.workspace }}
+      working-directory: .
 
   ## workaround for issue:
   # https://github.com/orgs/community/discussions/26671
