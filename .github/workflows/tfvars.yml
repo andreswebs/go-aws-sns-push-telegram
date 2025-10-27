@@ -43,7 +43,7 @@ jobs:
           echo "filename=${{ inputs.tfvars }}" >> $GITHUB_OUTPUT
 
       - name: Save .tfvars
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: ${{ steps.render.outputs.filename }}
           path: ./${{ steps.render.outputs.filename }}
